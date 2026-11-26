@@ -1,0 +1,13 @@
+# Variables de entorno con claves (nunca se suben)
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
