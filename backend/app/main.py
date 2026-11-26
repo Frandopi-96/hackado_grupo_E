@@ -1,40 +1,40 @@
 """API del prototipo de 480 Academy (FastAPI).
 
-De momento solo expone /api/health para comprobar que el backend
-y la base de datos están conectados. La documentación automática
-(OpenAPI) queda en /api/docs.
+Documentación automática (OpenAPI) en /api/docs.
 """
 
-import os
+from contextlib import asynccontextmanager
 
-import psycopg
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+
+from . import auth, perfil
+from .db import conectar, crear_tablas
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    crear_tablas()
+    yield
+
 
 app = FastAPI(
     title="480 Academy API",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     redoc_url=None,
+    lifespan=lifespan,
 )
 
-
-def _datos_conexion() -> dict:
-    """Datos de conexión a PostgreSQL, leídos de las variables de entorno."""
-    return {
-        "host": os.environ.get("DB_HOST", "db"),
-        "port": int(os.environ.get("DB_PORT", "5432")),
-        "user": os.environ["POSTGRES_USER"],
-        "password": os.environ["POSTGRES_PASSWORD"],
-        "dbname": os.environ["POSTGRES_DB"],
-    }
+app.include_router(auth.router)
+app.include_router(perfil.router)
 
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["infraestructura"])
 def health():
     """Comprueba que el backend responde y que la base de datos está accesible."""
     try:
-        with psycopg.connect(**_datos_conexion(), connect_timeout=3) as conn:
+        with conectar() as conn:
             conn.execute("SELECT 1")
         return {"status": "ok", "db": "ok"}
     except Exception:

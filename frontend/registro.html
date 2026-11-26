@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    /* Colores y tipografía de docs/DESIGN.md */
+    @theme {
+      --color-marca-oscuro: #1F2222;
+      --color-marca-verde: #39FE90;
+      --color-marca-cian: #1CF9FC;
+      --color-marca-rojo: #FF4950;
+      --color-gris-claro: #D0D5D2;
+      --color-superficie: #2A2E2E;
+      --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <script src="/js/api.js"></script>
+  <title>Crear cuenta · 480 Academy</title>
+</head>
+<body class="bg-marca-oscuro text-white font-sans min-h-dvh">
+  <main class="max-w-md mx-auto min-h-dvh flex flex-col px-6 py-8" x-data="registro()">
+    <h1 class="text-[28px] font-bold leading-tight">Crea tu cuenta</h1>
+    <p class="text-gris-claro mt-2">Tus datos solo se usan para identificarte en la plataforma. Nunca se envían a la IA.</p>
+
+    <form class="flex flex-col gap-4 mt-8 flex-1" @submit.prevent="enviar">
+      <label class="flex flex-col gap-1 text-sm font-medium text-gris-claro">Nombre
+        <input x-model="f.nombre" required maxlength="100" autocomplete="given-name"
+               class="h-12 px-4 rounded bg-superficie text-white text-base border border-gris-claro/30 focus:outline-2 focus:outline-marca-cian">
+      </label>
+      <label class="flex flex-col gap-1 text-sm font-medium text-gris-claro">Apellidos
+        <input x-model="f.apellidos" required maxlength="150" autocomplete="family-name"
+               class="h-12 px-4 rounded bg-superficie text-white text-base border border-gris-claro/30 focus:outline-2 focus:outline-marca-cian">
+      </label>
+      <label class="flex flex-col gap-1 text-sm font-medium text-gris-claro">Email
+        <input x-model="f.email" type="email" required autocomplete="email" inputmode="email"
+               class="h-12 px-4 rounded bg-superficie text-white text-base border border-gris-claro/30 focus:outline-2 focus:outline-marca-cian">
+      </label>
+      <label class="flex flex-col gap-1 text-sm font-medium text-gris-claro">Contraseña (mínimo 8 caracteres)
+        <div class="relative" x-data="{ ver: false }">
+          <input x-model="f.password" :type="ver ? 'text' : 'password'" required minlength="8" maxlength="128" autocomplete="new-password"
+                 class="w-full h-12 pl-4 pr-14 rounded bg-superficie text-white text-base border border-gris-claro/30 focus:outline-2 focus:outline-marca-cian">
+          <button type="button" @click="ver = !ver"
+                  :aria-label="ver ? 'Ocultar contraseña' : 'Mostrar contraseña'" :aria-pressed="ver"
+                  class="absolute right-0 top-0 h-12 w-12 flex items-center justify-center text-gris-claro hover:text-white">
+            <!-- Ojo abierto: la contraseña está oculta, pulsar para verla -->
+            <svg x-show="!ver" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            <!-- Ojo tachado: la contraseña se ve, pulsar para ocultarla -->
+            <svg x-show="ver" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-6" aria-hidden="true">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="2" y1="2" x2="22" y2="22"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+      <label class="flex items-center gap-3 min-h-12 text-base">
+        <input x-model="f.es_menor" type="checkbox" class="size-6 accent-marca-verde">
+        Soy menor de 18 años
+      </label>
+
+      <p x-show="error" x-text="error" role="alert" class="text-marca-rojo"></p>
+
+      <div class="mt-auto flex flex-col gap-4 pt-6">
+        <button type="submit" :disabled="enviando"
+                class="h-14 rounded bg-marca-verde text-marca-oscuro font-bold text-lg disabled:opacity-60">
+          <span x-text="enviando ? 'Creando cuenta…' : 'Crear cuenta'"></span>
+        </button>
+        <a href="/login.html" class="text-center text-marca-cian py-2">Ya tengo cuenta: entrar</a>
+      </div>
+    </form>
+  </main>
+  <script>
+    function registro() {
+      return {
+        f: { nombre: "", apellidos: "", email: "", password: "", es_menor: false },
+        error: "",
+        enviando: false,
+        async enviar() {
+          this.error = "";
+          this.enviando = true;
+          const r = await api("/auth/registro", { metodo: "POST", datos: this.f });
+          this.enviando = false;
+          if (r.ok) location.href = "/formulario.html";
+          else this.error = r.error;
+        },
+      };
+    }
+  </script>
+</body>
+</html>

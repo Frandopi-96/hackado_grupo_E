@@ -28,6 +28,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+    volumes:
+      # Los tests se ejecutan dentro del contenedor (ver AGENTS.md, comandos)
+      - ./tests:/app/tests:ro
     depends_on:
       db:
         condition: service_healthy
