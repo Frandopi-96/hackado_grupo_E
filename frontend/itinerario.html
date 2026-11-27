@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    /* Colores y tipografía de docs/DESIGN.md */
+    @theme {
+      --color-marca-oscuro: #1F2222;
+      --color-marca-verde: #39FE90;
+      --color-marca-cian: #1CF9FC;
+      --color-marca-rojo: #FF4950;
+      --color-gris-claro: #D0D5D2;
+      --color-superficie: #2A2E2E;
+      --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <script src="/js/api.js"></script>
+  <title>Tu itinerario · 480 Academy</title>
+</head>
+<body class="bg-marca-oscuro text-white font-sans min-h-dvh">
+  <!-- Página provisional: la sustituye la HU2 (itinerario personalizado). -->
+  <main class="max-w-md mx-auto min-h-dvh flex flex-col px-6 py-8" x-data="{ async salir() { await api('/auth/logout', { metodo: 'POST' }); location.href = '/login.html'; } }">
+    <h1 class="text-[28px] font-bold leading-tight">¡Perfil guardado!</h1>
+    <p class="text-gris-claro mt-2">Aquí aparecerá tu itinerario personalizado (HU2).</p>
+    <div class="mt-auto flex flex-col gap-4">
+      <a href="/formulario.html" class="h-14 rounded border border-gris-claro/30 flex items-center justify-center">Repetir el formulario</a>
+      <button type="button" @click="salir" class="text-marca-cian py-2">Cerrar sesión</button>
+    </div>
+  </main>
+</body>
+</html>
